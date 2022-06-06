@@ -1,0 +1,97 @@
+#!Nsis Installer Command Script
+#
+# This is an NSIS Installer Command Script generated automatically
+# by the Fedora nsiswrapper program.  For more information see:
+#
+#   http://fedoraproject.org/wiki/MinGW
+#
+# To build an installer from the script you would normally do:
+#
+#   makensis this_script
+#
+# which will generate the output file 'SSM Installer.exe' which is a Windows
+# installer containing your program.
+!include "EnvVarUpdate.nsh"
+Name "SSM"
+OutFile "SSM-@PACKAGE_VERSION@-setup.exe"
+InstallDir "C:\SSM"
+InstallDirRegKey HKLM SOFTWARE\SSM "Install_Dir"
+
+ShowInstDetails hide
+ShowUninstDetails hide
+
+# Uncomment this to enable BZip2 compression, which results in
+# slightly smaller files but uses more memory at install time.
+SetCompressor bzip2
+
+XPStyle on
+
+Page components
+Page directory
+Page instfiles
+
+ComponentText "Select which optional components you want to install."
+
+DirText "Please select the installation folder."
+
+Section "SSM"
+  SectionIn RO
+  SetOutPath "$INSTDIR\bin"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/iconv.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libffi-6.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libgio-2.0-0.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libglib-2.0-0.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libgmodule-2.0-0.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libgobject-2.0-0.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libgthread-2.0-0.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libintl-8.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/zlib1.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libgcc_s_sjlj-1.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libpcre-1.dll"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll"
+  File "../buildroot/usr/i686-w64-mingw32/sys-root/mingw/bin/ssm.exe"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/gspawn-win32-helper-console.exe"
+  File "/usr/i686-w64-mingw32/sys-root/mingw/bin/gspawn-win32-helper.exe"
+  ${EnvVarUpdate} $0 "PATH" "P" "HKLM" "$INSTDIR\bin"
+SectionEnd
+
+Section "Start Menu Shortcuts"
+  CreateDirectory "$SMPROGRAMS\SSM"
+  CreateShortCut "$SMPROGRAMS\SSM\Uninstall SSM.lnk" "$INSTDIR\Uninstall SSM.exe" "" "$INSTDIR\Uninstall SSM.exe" 0
+  CreateShortCut "$SMPROGRAMS\SSM\ssm.exe.lnk" "$INSTDIR\.\ssm.exe" "" "$INSTDIR\.\ssm.exe" 0
+SectionEnd
+
+Section "Desktop Icons"
+  CreateShortCut "$DESKTOP\ssm.exe.lnk" "$INSTDIR\.\ssm.exe" "" "$INSTDIR\.\ssm.exe" 0
+  CreateShortCut "$DESKTOP\gspawn-win32-helper-console.exe.lnk" "$INSTDIR\.\gspawn-win32-helper-console.exe" "" "$INSTDIR\.\gspawn-win32-helper-console.exe" 0
+  CreateShortCut "$DESKTOP\gspawn-win32-helper.exe.lnk" "$INSTDIR\.\gspawn-win32-helper.exe" "" "$INSTDIR\.\gspawn-win32-helper.exe" 0
+SectionEnd
+
+Section "Uninstall"
+  ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
+  Delete /rebootok "$DESKTOP\ssm.exe.lnk"
+  Delete /rebootok "$SMPROGRAMS\SSM\ssm.exe.lnk"
+  Delete /rebootok "$SMPROGRAMS\SSM\Uninstall SSM.lnk"
+  RMDir "$SMPROGRAMS\SSM"
+
+  Delete /rebootok "$INSTDIR\bin\gspawn-win32-helper.exe"
+  Delete /rebootok "$INSTDIR\bin\gspawn-win32-helper-console.exe"
+  Delete /rebootok "$INSTDIR\bin\ssm.exe"
+  RMDir "$INSTDIR\."
+
+  Delete /rebootok "$INSTDIR\bin\zlib1.dll"
+  Delete /rebootok "$INSTDIR\bin\libintl-8.dll"
+  Delete /rebootok "$INSTDIR\bin\libgthread-2.0-0.dll"
+  Delete /rebootok "$INSTDIR\bin\libgobject-2.0-0.dll"
+  Delete /rebootok "$INSTDIR\bin\libgmodule-2.0-0.dll"
+  Delete /rebootok "$INSTDIR\bin\libglib-2.0-0.dll"
+  Delete /rebootok "$INSTDIR\bin\libgio-2.0-0.dll"
+  Delete /rebootok "$INSTDIR\bin\libffi-6.dll"
+  Delete /rebootok "$INSTDIR\bin\iconv.dll"
+  RMDir "$INSTDIR"
+SectionEnd
+
+Section -post
+  WriteUninstaller "$INSTDIR\Uninstall SSM.exe"
+SectionEnd
+

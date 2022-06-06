@@ -1,0 +1,27 @@
+#!/bin/bash -x
+
+# Dependencies:
+# mingw32-pkg-config mingw32-dbus-glib mingw32-readline mingw32-gsl mingw32-nsis mingw32-nsiswrapper
+#
+
+set -e
+
+NAME="ssm-@PACKAGE_VERSION@"
+ROOT=`pwd`
+BUILDROOT="buildroot"
+BUILD="build"
+
+rm -fr $BUILD/$NAME
+tar zxvf $NAME.tar.gz -C $BUILD
+cd $BUILD/$NAME
+
+autoreconf -fi
+if [ -e Makefile ]; then make distclean; fi
+CPPFLAGS="-I /nilmbb/kkozlov/Projects/HighFive/include" CXXFLAGS="-I /nilmbb/kkozlov/Projects/HighFive/include" CFLAGS="-I /nilmbb/kkozlov/Projects/HighFive/include" DESTDIR=$ROOT/$BUILDROOT mingw32-configure
+DESTDIR=$ROOT/$BUILDROOT mingw32-make
+DESTDIR=$ROOT/$BUILDROOT mingw32-make install
+
+cd $ROOT/nsis
+
+makensis SSM.nsis
+

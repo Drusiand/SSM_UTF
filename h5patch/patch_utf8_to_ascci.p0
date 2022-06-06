@@ -1,0 +1,14 @@
+diff --git a/include/highfive/bits/H5DataType_misc.hpp b/include/highfive/bits/H5DataType_misc.hpp
+index eb251da..f93db13 100644
+--- a/include/highfive/bits/H5DataType_misc.hpp
++++ b/include/highfive/bits/H5DataType_misc.hpp
+@@ -336,7 +336,8 @@ inline hid_t create_string(size_t length){
+             "Unable to define datatype size to variable");
+     }
+     // define encoding to UTF-8 by default
+-    H5Tset_cset(_hid, H5T_CSET_UTF8);
++//    H5Tset_cset(_hid, H5T_CSET_UTF8);
++    H5Tset_cset(_hid, H5T_CSET_ASCII);
+     return _hid;
+ }
+ 

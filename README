@@ -1,0 +1,3 @@
+Need to patch HighFive with
+cd HighFive
+patch -p1 < ../h5patch/patch_utf8_to_ascci.p0

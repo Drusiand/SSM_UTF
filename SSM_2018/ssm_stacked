@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+import os, sys
+import numpy as np
+import pandas as pd
+from math import sqrt
+
+def run_ssm_once(N, L, samples_nm, features_nm, log_deeps):
+	cmd_str = 'ssm -G 0 -C 1 -A 1 -P 1 -T 1' + ' -N' + str(N) + ' -L' + str(L) + ' -R 1 -l 3.453 -D 230 -s 0.75 -i 1 -d 60 -w 15 -f 15 -m 2 -r 0.5 -t 900 -q 200 -z 0.13 -x 79 -c 0.5 -b 0.36 -k 0.264 -E 0.13 -j 1 -a 1 -o 3 -U 6 ' + samples_nm + ' ' + features_nm + ' ' + log_deeps
+	print(cmd_str)
+	os.system(cmd_str)
+	summary_nm = log_deeps + '_output_summary.txt'
+	return (summary_nm)
+
+def aggregate_stack(res_tabs, max_max):
+	stack_tab = []
+	list_of_models = []
+	kounter = 0
+	for j in range(0, len(res_tabs)):
+		cur_tab = pd.read_csv(res_tabs[j], sep=';')
+		y_data = cur_tab['event_day_R1'].to_numpy()
+		y_model = cur_tab['dtR1'].to_numpy()
+		err_corr = np.corrcoef(y_data, y_model)[0, 1]
+		err_max = np.max(abs(y_data - y_model))
+		print(str(j) + ' ' + 'correlation:' + str(err_corr) + ' ' + 'maximum:' + str(err_max) + ' ' + 'argmax:' + str(np.argmax(abs(y_data - y_model))))
+		if (err_max < max_max):
+			list_of_models.append(j)
+			kounter += 1
+			if (kounter == 1):
+				stack_tab = cur_tab
+			if (kounter > 1):
+				stack_tab['dtR1'] = stack_tab['dtR1'] + cur_tab['dtR1']
+	# for j in range(2876):
+		# print(str(j) + ' ' + stack_tab['dtR1'][j])
+		# tmp = int(stack_tab['dtR1'][j])/len(res_tabs)
+		# print(tmp)
+	# print(len(list_of_models))
+	# print(stack_tab.head())
+	stack_tab['dtR1'] = stack_tab['dtR1']/len(list_of_models)
+	# print(stack_tab.head())
+	return(stack_tab, list_of_models)
+
+if __name__ == "__main__":
+	samples_nm = sys.argv[1]
+	features_nm = sys.argv[2]
+	log_deeps_list_nm = sys.argv[3]
+	max_max = float(sys.argv[4])
+	res_tabs = []
+	with open(log_deeps_list_nm) as f:
+		for line in f:
+			line_tk = line.split(",")
+			res_tab = run_ssm_once(int(line_tk[1]), int(line_tk[2]), samples_nm, features_nm, line_tk[0])
+			res_tabs.append(res_tab)
+	stack_tab, list_of_models = aggregate_stack(res_tabs, max_max)
+	stack_tab.to_csv(log_deeps_list_nm + '_stack_output.csv')
+	y_data = stack_tab['event_day_R1'].to_numpy()
+	y_model = stack_tab['dtR1'].to_numpy()
+	print(list_of_models)
+	print('correlation=' + str(np.corrcoef(y_data, y_model)[0, 1]))
+	print('maximum=' + str(np.max(abs(y_data - y_model))))
+	print('average=' + str(np.mean(abs(y_data - y_model))))
+	print('median=' + str(np.median(abs(y_data - y_model))))
+	print('minimum=' + str(np.min(abs(y_data - y_model))))
+	print('rms=' + str(sqrt(np.square(y_data - y_model).mean())))

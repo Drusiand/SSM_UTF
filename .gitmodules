@@ -1,0 +1,6 @@
+[submodule "HighFive"]
+	path = HighFive
+	url = git@github.com:BlueBrain/HighFive.git
+[submodule "SSM_2018"]
+	path = SSM_2018
+	url = git@github.com:mackoel/SSM_2018.git
